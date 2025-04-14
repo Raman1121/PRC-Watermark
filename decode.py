@@ -41,7 +41,7 @@ exp_id = f'{method}_num_{test_num}_steps_{args.inf_steps}_fpr_{fpr}_nowm_{nowm}'
 with open(f'keys/{exp_id}.pkl', 'rb') as f:
     encoding_key, decoding_key = pickle.load(f)
 
-pipe = stable_diffusion_pipe(solver_order=1, model_id=model_id, cache_dir=hf_cache_dir)
+pipe = stable_diffusion_pipe(solver_order=1, model_id=model_id)
 pipe.set_progress_bar_config(disable=True)
 
 cur_inv_order = 0

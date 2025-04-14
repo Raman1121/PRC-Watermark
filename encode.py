@@ -87,7 +87,7 @@ else:
 
 prompts = random.sample(all_prompts, test_num)
 
-pipe = stable_diffusion_pipe(solver_order=1, model_id=model_id, cache_dir=hf_cache_dir)
+pipe = stable_diffusion_pipe(solver_order=1, model_id=model_id)
 pipe.set_progress_bar_config(disable=True)
 
 def seed_everything(seed, workers=False):
@@ -103,6 +103,7 @@ def seed_everything(seed, workers=False):
 for i in tqdm(range(test_num)):
     seed_everything(i)
     current_prompt = prompts[i]
+    print("PROMPT: ", current_prompt)
     if nowm:
         init_latents_np = np.random.randn(1, 4, 64, 64)
         init_latents = torch.from_numpy(init_latents_np).to(torch.float64).to(device)
