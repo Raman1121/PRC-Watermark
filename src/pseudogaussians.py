@@ -4,16 +4,28 @@ from scipy.linalg import orth
 import numpy as np
 
 
-def sample(codeword, basis=None):
-    # pseudogaussian = codeword * torch.abs(torch.randn_like(codeword, dtype=torch.float64))
-    codeword_np = codeword.numpy()
-    noise = np.random.randn(*codeword_np.shape)
-    # Putting the noise in the fourier domain. Fourier transform of a gaussian is a gaussian
+def sample(codeword, basis=None, target_shape=(4, 64, 64)):
 
-    print(noise.shape)
-    fft_noise = torch.fft.fftshift(torch.fft.fft2(torch.tensor(noise)), dim=(-1, -2))
-    print(fft_noise.shape)
-    coded_fourier_noise = codeword_np * np.abs(fft_noise.numpy())
+    # Reshape codeword to the target 2D structure (e.g., C, H, W)
+    codeword_reshaped = codeword.reshape(target_shape)
+    codeword_np = codeword_reshaped.cpu().numpy() # Use cpu() if codeword might be on GPU
+
+    # Generate noise with the target 2D shape directly
+    noise = np.random.randn(*target_shape)
+    noise_tensor = torch.tensor(noise, dtype=torch.float32) # Match typical FFT dtype
+
+    # --- Perform 2D FFT operations ---
+    # Put the noise in the fourier domain. Fourier transform of a gaussian is a gaussian
+    # fft2 operates on the last two dimensions by default, which is (64, 64) here.
+    fft_noise = torch.fft.fftshift(torch.fft.fft2(noise_tensor), dim=(-1, -2))
+
+    # Ensure codeword_np is broadcastable if needed, but shape should match fft_noise now
+    # Use torch operations for consistency and potential GPU acceleration
+    # Using abs on the complex fft result
+    coded_fourier_noise = torch.tensor(codeword_np, device=fft_noise.device) * torch.abs(fft_noise) # Apply codeword amplitude modulation in Fourier domain
+
+    # Apply inverse shift and inverse FFT
+    # ifftshift operates on the last two dimensions by default
     pseudogaussian = torch.fft.ifft2(torch.fft.ifftshift(coded_fourier_noise, dim=(-1, -2))).real
     print(pseudogaussian.shape)
     print(basis)
