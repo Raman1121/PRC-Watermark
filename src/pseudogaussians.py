@@ -6,25 +6,28 @@ import numpy as np
 
 def sample(codeword, basis=None):
     # pseudogaussian = codeword * torch.abs(torch.randn_like(codeword, dtype=torch.float64))
-    # codeword_np = codeword.numpy()
-    # noise = np.random.randn(*codeword_np.shape)
-    # # Putting the noise in the fourier domain. Fourier transform of a gaussian is a gaussian
-    # try:
-    #     fft_noise = torch.fft.fftshift(torch.fft.fft2(torch.tensor(noise)), dim=(-1, -2))
-    #     coded_fourier_noise = codeword_np * np.abs(fft_noise.numpy())
-    #     pseudogaussian = torch.fft.ifft2(torch.fft.ifftshift(coded_fourier_noise, dim=(-1, -2))).real
-    # except:
-    #     import pdb; pdb.set_trace()
-    
-    # if basis is None:
-    #     return pseudogaussian
-    # return pseudogaussian @ basis.T
     codeword_np = codeword.numpy()
-    pseudogaussian_np = codeword_np * np.abs(np.random.randn(*codeword_np.shape))
-    pseudogaussian = torch.from_numpy(pseudogaussian_np).to(dtype=torch.float64)
+    noise = np.random.randn(*codeword_np.shape)
+    # Putting the noise in the fourier domain. Fourier transform of a gaussian is a gaussian
+
+    print(noise.shape)
+    fft_noise = torch.fft.fftshift(torch.fft.fft2(torch.tensor(noise)), dim=(-1, -2))
+    print(fft_noise.shape)
+    coded_fourier_noise = codeword_np * np.abs(fft_noise.numpy())
+    pseudogaussian = torch.fft.ifft2(torch.fft.ifftshift(coded_fourier_noise, dim=(-1, -2))).real
+    print(pseudogaussian.shape)
+    print(basis)
+
     if basis is None:
         return pseudogaussian
     return pseudogaussian @ basis.T
+
+    # codeword_np = codeword.numpy()
+    # pseudogaussian_np = codeword_np * np.abs(np.random.randn(*codeword_np.shape))
+    # pseudogaussian = torch.from_numpy(pseudogaussian_np).to(dtype=torch.float64)
+    # if basis is None:
+    #     return pseudogaussian
+    # return pseudogaussian @ basis.T
 
 def recover_posteriors(z, basis=None, variances=None):
     if variances is None:
