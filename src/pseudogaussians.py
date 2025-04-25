@@ -27,8 +27,6 @@ def sample(codeword, basis=None, target_shape=(4, 64, 64)):
     # Apply inverse shift and inverse FFT
     # ifftshift operates on the last two dimensions by default
     pseudogaussian = torch.fft.ifft2(torch.fft.ifftshift(coded_fourier_noise, dim=(-1, -2))).real
-    print(pseudogaussian.shape)
-    print(basis)
 
     if basis is None:
         return pseudogaussian
