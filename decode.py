@@ -54,7 +54,9 @@ for i in tqdm(range(test_num)):
                                        inv_order=cur_inv_order,
                                        pipe=pipe
                                        )
+    print(reversed_latents)                                    
     reversed_prc = prc_gaussians.recover_posteriors(reversed_latents.to(torch.float64).flatten().cpu(), variances=float(var)).flatten().cpu()
+    print(reversed_prc)
     detection_result = Detect(decoding_key, reversed_prc)
     decoding_result = (Decode(decoding_key, reversed_prc) is not None)
     combined_result = detection_result or decoding_result
