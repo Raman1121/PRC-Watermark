@@ -40,8 +40,8 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: pytorch-cuda12-6
-          # image: pytorch/pytorch:2.6.0-cuda12.6-cudnn9-devel
-          image: demisto/opencv:1.0.0.2034788
+          image: pytorch/pytorch:2.6.0-cuda12.6-cudnn9-devel
+          # image: demisto/opencv:1.0.0.2034788
           workingDir: "/workspace/PRC-WATERMARK"
           env:
             # --- START ADDITION ---
