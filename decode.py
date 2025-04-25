@@ -57,11 +57,10 @@ for i in tqdm(range(test_num)):
 
     reversed_latents = reversed_latents.reshape(4, 64, 64)
 
-    fft_latents = torch.fft.fftshift(torch.fft.fft2(reversed_latents), dim=(-1, -2))
-    print(f'FFT Latents: {fft_latents.shape}', fft_latents.flatten().cpu())
-    exit()
+    fft_latents = torch.fft.fftshift(torch.fft.fft2(reversed_latents), dim=(-1, -2)).real
 
-    reversed_prc = prc_gaussians.recover_posteriors(reversed_latents.to(torch.float64).flatten().cpu(), variances=float(var)).flatten().cpu()
+
+    reversed_prc = prc_gaussians.recover_posteriors(fft_latents.to(torch.float64).flatten().cpu(), variances=float(var)).flatten().cpu()
     detection_result = Detect(decoding_key, reversed_prc)
     decoding_result = (Decode(decoding_key, reversed_prc) is not None)
     combined_result = detection_result or decoding_result
