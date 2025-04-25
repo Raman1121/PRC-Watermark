@@ -95,7 +95,8 @@ spec:
               pip3 install -r requirements.txt
               echo "Done!!"
 
-              pip install -U "huggingface_hub[cli]"
+              
+              pip install -U "huggingface_hub[cli]==0.25.2"
 
               echo "Logging into HF"
               chmod +x hf-login.sh
