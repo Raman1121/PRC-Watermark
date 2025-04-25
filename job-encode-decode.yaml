@@ -40,8 +40,8 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: pytorch-cuda12-6
-          # image: pytorch/pytorch:2.6.0-cuda12.6-cudnn9-devel
-          image: demisto/opencv:1.0.0.2034788
+          image: pytorch/pytorch:2.6.0-cuda12.6-cudnn9-devel
+          # image: demisto/opencv:1.0.0.2034788
           workingDir: "/workspace/PRC-WATERMARK"
           env:
             # --- START ADDITION ---
@@ -89,11 +89,24 @@ spec:
               rm -rf /var/lib/apt/lists/*
  
               # python -c "import torch; print(f'Torch version: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}'); print(f'CUDA version: {torch.version.cuda}'); print(f'Torch path: {torch.__file__}')"
-
+              
               echo "Setting up environment..."
               export PYTHONPATH=$PYTHONPATH:/workspace/PRC-WATERMARK
               pip3 install -r requirements.txt
               echo "Done!!"
+
+              pip install -U "huggingface_hub[cli]"
+
+              echo "Logging into HF"
+              chmod +x hf-login.sh
+              ./hf-login.sh
+
+              echo "Encoding!!!"
+              mkdir keys
+              python encode.py --test_num 10
+
+              echo "Decoding!!!"
+              python decode.py --test_num 10
 
           resources:
             limits:
