@@ -17,17 +17,17 @@ def sample(codeword, basis=None, target_shape=(4, 64, 64)):
     # --- Perform 2D FFT operations ---
     # Put the noise in the fourier domain. Fourier transform of a gaussian is a gaussian
     # fft2 operates on the last two dimensions by default, which is (64, 64) here.
-    fft_noise = torch.fft.fftshift(torch.fft.fft2(noise_tensor), dim=(-1, -2))
+    
 
     # Ensure codeword_np is broadcastable if needed, but shape should match fft_noise now
     # Use torch operations for consistency and potential GPU acceleration
     # Using abs on the complex fft result
-    coded_fourier_noise = torch.tensor(codeword_np, device=fft_noise.device) * torch.abs(fft_noise.real) # Apply codeword amplitude modulation in Fourier domain
+    coded_fourier_noise = torch.tensor(codeword_np, device=fft_noise.device) * torch.abs(noise_tensor) # Apply codeword amplitude modulation in Fourier domain
 
     # Apply inverse shift and inverse FFT
     # ifftshift operates on the last two dimensions by default
     pseudogaussian = torch.fft.ifft2(torch.fft.ifftshift(coded_fourier_noise, dim=(-1, -2))).real
-
+    pseudogaussian = pseudogaussian * np.sqrt(2*np.pi) # Normalize the pseudogaussian to be N(0, 1)
     if basis is None:
         return pseudogaussian
     return pseudogaussian @ basis.T
