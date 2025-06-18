@@ -1,4 +1,4 @@
-# sequential_attack_script.py
+# attacks.py
 
 import os
 import io
@@ -181,20 +181,20 @@ def main():
 
 if __name__ == "__main__":
     # --- HOW TO RUN ---
-    # 1. Save this script as `sequential_attack_script.py`.
+    # 1. Save this script as `attacks.py`.
     # 2. Create a folder with your source images (e.g., `my_watermarked_images`).
     #
     # 3. Run from your terminal, specifying the attacks you want to chain together.
     #
     # Example 1: Apply only a single rotation
-    # python sequential_attack_script.py my_watermarked_images --rotation 45
+    # python attacks.py my_watermarked_images --rotation 45
     #
     # Example 2: Apply only a single JPEG compression
-    # python sequential_attack_script.py my_watermarked_images --jpeg_q 50
+    # python attacks.py my_watermarked_images --jpeg_q 50
     #
     # Example 3: Chain three attacks: crop, then rotate, then save as JPEG
-    # python sequential_attack_script.py my_watermarked_images --crop_factor 0.9 --rotation 15 --jpeg_q 75
+    # python attacks.py my_watermarked_images --crop_factor 0.9 --rotation 15 --jpeg_q 75
     #
     # Example 4: A more complex chain of geometric and photometric attacks
-    # python sequential_attack_script.py my_watermarked_images --rotation -10 --scale_factor 0.7 --brightness 1.1 --noise_std 5
+    # python attacks.py my_watermarked_images --rotation -10 --scale_factor 0.7 --brightness 1.1 --noise_std 5
     main()

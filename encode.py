@@ -5,6 +5,7 @@ import pickle
 import json
 from tqdm import tqdm
 import random
+from torch.utils.data import Dataset, DataLoader
 import numpy as np
 from datasets import load_dataset
 from src.prc import KeyGen, Encode, str_to_bin, bin_to_str
@@ -12,6 +13,19 @@ import src.pseudogaussians as prc_gaussians
 from src.baseline.gs_watermark import Gaussian_Shading_chacha
 from src.baseline.treering_watermark import tr_detect, tr_get_noise
 from inversion import stable_diffusion_pipe, generate
+
+class PromptDataset(Dataset):
+    def __init__(self, prompts):
+
+        assert prompts is not None
+        self.prompts = prompts
+
+    def __len__(self):
+        return len(self.prompts)
+
+    def __getitem__(self, idx):
+        prompt = self.prompts[idx]
+        return prompt
 
 parser = argparse.ArgumentParser('Args')
 parser.add_argument('--test_num', type=int, default=10)
@@ -71,9 +85,9 @@ else:
     raise NotImplementedError
 
 if dataset_id == 'coco':
-    save_folder = f'./results/{exp_id}_coco/original_images'
+    save_folder = f'./results/{exp_id}_coco/original_images_{method}'
 else:
-    save_folder = f'./results/{exp_id}/original_images'
+    save_folder = f'./results/{exp_id}/original_images_{method}'
 if not os.path.exists(save_folder):
     os.makedirs(save_folder)
 print(f'Saving original images to {save_folder}')
@@ -125,5 +139,6 @@ for i in tqdm(range(test_num)):
                                 pipe=pipe
                                 )
     orig_image.save(f'{save_folder}/{i}.png')
+    
 
 print(f'Done generating {method} images')

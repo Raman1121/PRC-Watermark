@@ -13,7 +13,7 @@ import src.pseudogaussians as prc_gaussians
 from inversion import stable_diffusion_pipe, exact_inversion
 
 parser = argparse.ArgumentParser('Args')
-parser.add_argument('--test_num', type=int, default=10)
+parser.add_argument('--test_num', type=int, default=None)
 parser.add_argument('--method', type=str, default='prc') # gs, tr, prc
 parser.add_argument('--model_id', type=str, default='stabilityai/stable-diffusion-2-1-base')
 parser.add_argument('--dataset_id', type=str, default='Gustavosta/Stable-Diffusion-Prompts')
@@ -36,7 +36,8 @@ assert args.test_path is not None
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 n = 4 * 64 * 64  # the length of a PRC codeword
 method = args.method
-test_num = args.test_num
+test_num = args.test_num if args.test_num is not None else len(os.listdir(args.test_path))
+print("Number of images to test:", test_num)
 model_id = args.model_id
 dataset_id = args.dataset_id
 nowm = args.nowm
