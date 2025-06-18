@@ -21,12 +21,18 @@ parser.add_argument('--inf_steps', type=int, default=50)
 parser.add_argument('--nowm', type=int, default=0)
 parser.add_argument('--fpr', type=float, default=0.00001)
 parser.add_argument('--prc_t', type=int, default=3)
+parser.add_argument('--key_path', type=str, default=None)
 
 parser.add_argument('--test_path', type=str, default='original_images')
+parser.add_argument('--attack_type', type=str, default='original')
+parser.add_argument('--img_extension', type=str, default='png')
 args = parser.parse_args()
 print(args)
 
-hf_cache_dir = '/home/xuandong/mnt/hf_models'
+assert args.key_path is not None
+assert args.test_path is not None
+
+# hf_cache_dir = '/home/xuandong/mnt/hf_models'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 n = 4 * 64 * 64  # the length of a PRC codeword
 method = args.method
@@ -38,7 +44,10 @@ fpr = args.fpr
 prc_t = args.prc_t
 exp_id = f'{method}_num_{test_num}_steps_{args.inf_steps}_fpr_{fpr}_nowm_{nowm}'
 
-with open(f'keys/{exp_id}.pkl', 'rb') as f:
+# with open(f'keys/{exp_id}.pkl', 'rb') as f:
+#     encoding_key, decoding_key = pickle.load(f)
+with open(args.key_path, 'rb') as f:
+    print("Loading watermark key from:", args.key_path)
     encoding_key, decoding_key = pickle.load(f)
 
 pipe = stable_diffusion_pipe(solver_order=1, model_id=model_id)
@@ -48,7 +57,9 @@ cur_inv_order = 0
 var = 1.5
 combined_results = []
 for i in tqdm(range(test_num)):
-    img = Image.open(f'results/{exp_id}/{args.test_path}/{i}.png')
+    # img = Image.open(f'results/{exp_id}/{args.test_path}/{i}.png')
+    filename = f'{i}.{args.img_extension}'
+    img = Image.open(os.path.join(args.test_path, filename))
     reversed_latents = exact_inversion(img,
                                        prompt='',
                                        test_num_inference_steps=args.inf_steps,
@@ -62,8 +73,8 @@ for i in tqdm(range(test_num)):
     combined_results.append(combined_result)
     print(f'{i:03d}: Detection: {detection_result}; Decoding: {decoding_result}; Combined: {combined_result}')
 
-with open('decoded.txt', 'w') as f:
+with open(f'decoded_{args.attack_type}.txt', 'w') as f:
     for result in combined_results:
         f.write(f'{result}\n')
 
-print(f'Decoded results saved to decoded.txt')
+print(f'Decoded results saved to decoded_{args.attack_type}.txt')
